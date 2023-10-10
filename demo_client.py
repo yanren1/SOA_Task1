@@ -2,19 +2,6 @@ from flask import Flask, render_template, request
 from cal import calculate
 from get_soap import getSoapN2wMethod
 
-import torch
-from transformers import VisionEncoderDecoderModel, ViTImageProcessor, AutoTokenizer,VitsModel
-import scipy
-from playsound import playsound
-import time
-import os
-
-tts_model = VitsModel.from_pretrained("facebook/mms-tts-eng")
-tts_tokenizer = AutoTokenizer.from_pretrained("facebook/mms-tts-eng")
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-tts_model.to(device)
-
 app = Flask(__name__)
 @app.route('/', methods=['GET', 'POST'])
 def calculator():
@@ -71,16 +58,6 @@ def calculator():
                 display = calculate(display)
                 n2d = getSoapN2wMethod('NumberToDollars', display)
                 n2w = getSoapN2wMethod('NumberToWords', display)
-
-                inputs = tts_tokenizer("equals " + n2d, return_tensors="pt")
-                with torch.no_grad():
-                    output = tts_model(**inputs.to(device)).waveform
-
-                scipy.io.wavfile.write("tts.wav", rate=tts_model.config.sampling_rate, data=output[0].cpu().numpy())
-
-                playsound("tts.wav")
-                os.unlink("tts.wav")
-
             except:
                 display = 'Error'
                 n2d = 'Error'

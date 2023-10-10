@@ -1,5 +1,6 @@
 from get_soap import getSoapCalMethod
 
+
 # usage of remote soap service and calculation logic
 def calculate(expression):
     if expression == '':
